@@ -23,7 +23,10 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
+
 import de.tuberlin.dima.aim3.HadoopTestCase;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.util.Tool;
 import org.apache.mahout.common.iterator.FileLineIterable;
@@ -64,7 +67,9 @@ public class BookAndAuthorJoinTest extends HadoopTestCase {
 
     String outputFilename = mapOnly ? "part-m-00000" : "part-r-00000";
     
-    Multimap<String, Book> booksByAuthors = readBooksByAuthors(new File(outputDir, outputFilename));
+    File outputFile = new File(outputDir, outputFilename);
+    System.out.println(FileUtils.readLines(outputFile));
+	Multimap<String, Book> booksByAuthors = readBooksByAuthors(outputFile);
 
     assertTrue(booksByAuthors.containsKey("Charles Bukowski"));
     assertTrue(booksByAuthors.get("Charles Bukowski")

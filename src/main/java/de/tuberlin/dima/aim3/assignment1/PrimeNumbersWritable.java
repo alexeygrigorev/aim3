@@ -27,37 +27,52 @@ import java.util.Arrays;
 
 public class PrimeNumbersWritable implements Writable {
 
-  private int[] numbers;
+	private int[] numbers;
 
-  public PrimeNumbersWritable() {
-    numbers = new int[0];
-  }
+	public PrimeNumbersWritable() {
+		numbers = new int[0];
+	}
 
-  public PrimeNumbersWritable(int... numbers) {
-    this.numbers = numbers;
-  }
+	public PrimeNumbersWritable(int... numbers) {
+		this.numbers = numbers;
+	}
 
-  @Override
-  public void write(DataOutput out) throws IOException {
-    //IMPLEMENT ME
-  }
+	@Override
+	public void write(DataOutput out) throws IOException {
+		int len = numbers.length;
+		out.writeInt(len);
+		for (int i = 0; i < len; i++) {
+			out.writeInt(numbers[i]);
+		}
+	}
 
-  @Override
-  public void readFields(DataInput in) throws IOException {
-    //IMPLEMENT ME
-  }
+	@Override
+	public void readFields(DataInput in) throws IOException {
+		int len = in.readInt();
+		int[] numbers = new int[len];
+		for (int i = 0; i < len; i++) {
+			numbers[i] = in.readInt();
+		}
 
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof PrimeNumbersWritable) {
-      PrimeNumbersWritable other = (PrimeNumbersWritable) obj;
-      return Arrays.equals(numbers, other.numbers);
-    }
-    return false;
-  }
+		this.numbers = numbers;
+	}
 
-  @Override
-  public int hashCode() {
-    return Arrays.hashCode(numbers);
-  }
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof PrimeNumbersWritable) {
+			PrimeNumbersWritable other = (PrimeNumbersWritable) obj;
+			return Arrays.equals(numbers, other.numbers);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(numbers);
+	}
+
+	@Override
+	public String toString() {
+		return "PrimeNumbersWritable [numbers=" + Arrays.toString(numbers) + "]";
+	}
 }
