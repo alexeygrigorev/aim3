@@ -21,21 +21,22 @@ package de.tuberlin.dima.aim3.assignment2;
 
 public class Config {
 
-  private Config() {}
+	private Config() {
+	}
 
-  public static int numberOfSubtasks() {
-    return 2;
-  }
+	public static int numberOfSubtasks() {
+		return 2;
+	}
 
-  public static String pathToSlashdotZoo() {
-    return "/home/ssc/Downloads/out.matrix";
-  }
+	public static String pathToSlashdotZoo() {
+		return "c:/tmp/out.matrix";
+	}
 
-  public static String outputPath() {
-    return "/tmp/flink/";
-  }
+	public static String outputPath() {
+		return "c:/tmp/flink/";
+	}
 
-  public static long randomSeed() {
-    return 0xdeadbeef;
-  }
+	public static long randomSeed() {
+		return 0xdeadbeef;
+	}
 }
