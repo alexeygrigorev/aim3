@@ -88,8 +88,13 @@ public class BookAndAuthorBroadcastJoin extends HadoopJob {
 		protected void map(Object key, Text line, Context ctx) throws IOException, InterruptedException {
 			String stringLine = line.toString();
 			String[] split = stringLine.split("\t");
-			
-			String author = index.get(split[0]);
+	
+			String id = split[0];
+			if (!index.containsKey(id)) {
+				return;
+			}
+
+			String author = index.get(id);
 			String bookTitle = split[2];
 			String year = split[1];
 
