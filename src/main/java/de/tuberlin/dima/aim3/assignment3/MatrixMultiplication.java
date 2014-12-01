@@ -78,7 +78,7 @@ public class MatrixMultiplication {
 		return ArrayTable.create(keys, keys);
 	}
 
-	public DataSource<Tuple3<Integer, Integer, Integer>> readSparseMatrix(ExecutionEnvironment env,
+	public static DataSource<Tuple3<Integer, Integer, Integer>> readSparseMatrix(ExecutionEnvironment env,
 			String filePath) {
 		CsvReader csvReader = env.readCsvFile(filePath);
 		csvReader.fieldDelimiter(',');
@@ -86,7 +86,7 @@ public class MatrixMultiplication {
 		return csvReader.types(Integer.class, Integer.class, Integer.class);
 	}
 
-	private static final class ProjectJoinResultMapper implements
+	public static final class ProjectJoinResultMapper implements
 				MapFunction<Tuple2<Tuple3<Integer, Integer, Integer>, 
 								   Tuple3<Integer, Integer, Integer>>, 
 						    Tuple3<Integer, Integer, Integer>> {
