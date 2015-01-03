@@ -18,20 +18,21 @@
 
 package de.tuberlin.dima.aim3.assignment1;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.Maps;
-import com.google.common.io.Files;
-import de.tuberlin.dima.aim3.HadoopTestCase;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.mahout.common.iterator.FileLineIterable;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.apache.hadoop.conf.Configuration;
+import org.junit.Test;
+
+import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
+import com.google.common.io.Files;
+
+import de.tuberlin.dima.aim3.HadoopTestCase;
 
 /**
  * Unit test for word count task.
@@ -44,6 +45,7 @@ public class FilteringWordCountTest extends HadoopTestCase {
     File inputFile = getTestTempFile("lotr.txt");
     File outputDir = getTestTempDir("output");
     outputDir.delete();
+    
 
     writeLines(inputFile,
         "One Ring to rule them all,",
@@ -55,7 +57,8 @@ public class FilteringWordCountTest extends HadoopTestCase {
     FilteringWordCount wordCount = new FilteringWordCount();
     wordCount.setConf(conf);
 
-    wordCount.run(new String[] { "--input", inputFile.getAbsolutePath(), "--output", outputDir.getAbsolutePath() });
+    wordCount.run(new String[] { "--input", inputFile.getAbsolutePath(), 
+    		"--output", outputDir.getAbsolutePath() });
 
     Map<String, Integer> counts = getCounts(new File(outputDir, "part-r-00000"));
 

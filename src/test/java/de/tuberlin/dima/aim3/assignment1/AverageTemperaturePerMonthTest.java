@@ -18,20 +18,21 @@
 
 package de.tuberlin.dima.aim3.assignment1;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.Maps;
-import com.google.common.io.Files;
-import de.tuberlin.dima.aim3.HadoopTestCase;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.mahout.common.iterator.FileLineIterable;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static org.junit.Assert.assertEquals;
+import org.apache.hadoop.conf.Configuration;
+import org.junit.Test;
+
+import com.google.common.base.Charsets;
+import com.google.common.collect.Maps;
+import com.google.common.io.Files;
+
+import de.tuberlin.dima.aim3.HadoopTestCase;
 
 public class AverageTemperaturePerMonthTest extends HadoopTestCase {
 
@@ -50,8 +51,10 @@ public class AverageTemperaturePerMonthTest extends HadoopTestCase {
     AverageTemperaturePerMonth averageTemperaturePerMonth = new AverageTemperaturePerMonth();
     averageTemperaturePerMonth.setConf(conf);
 
-    averageTemperaturePerMonth.run(new String[] { "--input", inputFile.getAbsolutePath(),
-        "--output", outputDir.getAbsolutePath(), "--minimumQuality", String.valueOf(minimumQuality) });
+    averageTemperaturePerMonth.run(new String[] { 
+    	"--input", inputFile.getAbsolutePath(),
+        "--output", outputDir.getAbsolutePath(), 
+        "--minimumQuality", String.valueOf(minimumQuality) });
 
 
     Map<YearAndMonth, Double> results = readResults(new File(outputDir, "part-r-00000"));

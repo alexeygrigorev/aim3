@@ -57,7 +57,10 @@ public abstract class HadoopJob extends Configured implements Tool {
       Class<? extends Reducer> reducer, Class<? extends Writable> reducerKey, Class<? extends Writable> reducerValue,
       Class<? extends OutputFormat> outputFormat) throws IOException {
 
-    Job job = new Job(new Configuration(getConf()));
+    Configuration conf = getConf();
+    conf.set("hadoop.tmp.dir", "c:/tmp/");
+    conf.set("fs.file.impl", "com.conga.services.hadoop.patch.HADOOP_7682.WinLocalFileSystem");
+	Job job = new Job(new Configuration(conf));
     Configuration jobConf = job.getConfiguration();
 
     if (reducer.equals(Reducer.class)) {
@@ -94,7 +97,10 @@ public abstract class HadoopJob extends Configured implements Tool {
        Class<? extends Mapper> mapper, Class<? extends Writable> mapperKey, Class<? extends Writable> mapperValue,
        Class<? extends OutputFormat> outputFormat) throws IOException {
 
-    Job job = new Job(new Configuration(getConf()));
+    Configuration conf = getConf();
+    conf.set("hadoop.tmp.dir", "c:/tmp/");
+    conf.set("fs.file.impl", "com.conga.services.hadoop.patch.HADOOP_7682.WinLocalFileSystem");
+	Job job = new Job(new Configuration(conf));
     Configuration jobConf = job.getConfiguration();
 
     if (mapper.equals(Mapper.class)) {
