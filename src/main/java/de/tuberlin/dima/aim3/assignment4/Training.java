@@ -18,51 +18,84 @@
 
 package de.tuberlin.dima.aim3.assignment4;
 
+import java.util.List;
+
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.operators.DataSource;
+import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.fs.FileSystem;
 import org.apache.flink.util.Collector;
 
-
 public class Training {
 
-  public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
+		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+		DataSource<String> input = env.readTextFile(Config.pathToTrainingSet());
 
-    ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+		// estimate P(Y=y)
+		DataSet<Tuple2<String, Long>> docs = input.flatMap(new LabelReader()).groupBy(0).sum(1);
+		DataSet<Tuple1<Long>> totalSum = docs.sum(1).project(1).types(Long.class);
+		DataSet<Tuple2<String, Double>> labelPriors = 
+				docs.map(new NormalizeMapper()).withBroadcastSet(totalSum, "totalSum");
+		labelPriors.writeAsCsv(Config.pathToPriors(), "\n", "\t", FileSystem.WriteMode.OVERWRITE);
 
-    DataSource<String> input = env.readTextFile(Config.pathToTrainingSet());
+		// estimate P(w | Y=y)
+		DataSet<Tuple3<String, String, Long>> labeledTerms = input.flatMap(new TokenReader());
 
-    // read input with df-cut
-    DataSet<Tuple3<String, String, Long>> labeledTerms = input.flatMap(new DataReader());
+		// conditional counter per word per label
+		DataSet<Tuple3<String, String, Long>> termCounts = labeledTerms.groupBy(1, 0).sum(2);
+		termCounts.writeAsCsv(Config.pathToConditionals(), "\n", "\t", FileSystem.WriteMode.OVERWRITE);
 
-    // conditional counter per word per label
-    DataSet<Tuple3<String, String, Long>> termCounts = null; // IMPLEMENT ME
+		DataSet<Tuple2<String, Long>> wordCountPerLabel = labeledTerms.groupBy(0).sum(2).project(0, 2)
+				.types(String.class, Long.class);
+		wordCountPerLabel.writeAsCsv(Config.pathToSums(), "\n", "\t", FileSystem.WriteMode.OVERWRITE);
 
-    termCounts.writeAsCsv(Config.pathToConditionals(), "\n", "\t", FileSystem.WriteMode.OVERWRITE);
+		env.execute();
+	}
 
-    // word counts per label
-    DataSet<Tuple2<String, Long>> termLabelCounts = null; // IMPLEMENT ME
+	private static final class NormalizeMapper extends RichMapFunction<Tuple2<String, Long>, 
+				Tuple2<String, Double>> {
+		private long totalSum;
 
-    termLabelCounts.writeAsCsv(Config.pathToSums(), "\n", "\t", FileSystem.WriteMode.OVERWRITE);
+		@Override
+		public void open(Configuration parameters) throws Exception {
+			super.open(parameters);
+			List<Tuple1<Long>> totalSumList = getRuntimeContext().getBroadcastVariable("totalSum");
+			this.totalSum = totalSumList.get(0).f0;
+		}
+		
+		@Override
+		public Tuple2<String, Double> map(Tuple2<String, Long> value) throws Exception {
+			return new Tuple2<String, Double>(value.f0, ((double) value.f1) / totalSum);
+		}
+	}
 
-    env.execute();
-  }
 
-  public static class DataReader implements FlatMapFunction<String, Tuple3<String, String, Long>> {
-    @Override
-    public void flatMap(String line, Collector<Tuple3<String, String, Long>> collector) throws Exception {
+	private static class LabelReader implements FlatMapFunction<String, Tuple2<String, Long>> {
+		@Override
+		public void flatMap(String line, Collector<Tuple2<String, Long>> collector) throws Exception {
+			String[] tokens = line.split("\t");
+			String label = tokens[0];
+			collector.collect(new Tuple2<String, Long>(label, 1L));
+		}
+	}
+	
+	private static class TokenReader implements FlatMapFunction<String, Tuple3<String, String, Long>> {
+		@Override
+		public void flatMap(String line, Collector<Tuple3<String, String, Long>> collector) throws Exception {
+			String[] tokens = line.split("\t");
+			String label = tokens[0];
+			String[] terms = tokens[1].split(",");
 
-      String[] tokens = line.split("\t");
-      String label = tokens[0];
-      String[] terms = tokens[1].split(",");
-
-      for (String term : terms) {
-        collector.collect(new Tuple3<String, String, Long>(label, term, 1L));
-      }
-    }
-  }
+			for (String term : terms) {
+				collector.collect(new Tuple3<String, String, Long>(label, term, 1L));
+			}
+		}
+	}
 }

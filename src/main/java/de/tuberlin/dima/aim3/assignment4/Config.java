@@ -19,34 +19,46 @@
 package de.tuberlin.dima.aim3.assignment4;
 
 public class Config {
+	private static final String INPUT_PATH = "c:/tmp/assi4/in/";
+	private static final String OUTPUT_PATH = "c:/tmp/assi4/out/";
 
-  private static final String INPUT_PATH = "/home/ssc/Entwicklung/projects/aim3/src/test/resources/assignment4/";
-  private static final String OUTPUT_PATH = "/tmp/assi4/";
+	private Config() {
+	}
 
-  private Config() {}
+	public static String pathToTrainingSet() {
+		return INPUT_PATH + "train.tab";
+	}
 
-  public static String pathToTrainingSet() {
-    return INPUT_PATH + "train.tab";
-  }
+	public static String pathToTestSet() {
+		return INPUT_PATH + "test.tab";
+	}
 
-  public static String pathToTestSet() {
-    return INPUT_PATH + "test.tab";
-  }
+	public static String pathToOutput() {
+		return OUTPUT_PATH + "result";
+	}
 
-  public static String pathToOutput() {
-    return OUTPUT_PATH + "result";
-  }
+	public static String pathToSums() {
+		return OUTPUT_PATH + "sums";
+	}
 
-  public static String pathToSums() {
-    return OUTPUT_PATH + "sums";
-  }
+	public static String pathToPriors() {
+		return OUTPUT_PATH + "priors";
+	}
 
-  public static String pathToConditionals() {
-    return OUTPUT_PATH + "conditionals";
-  }
+	public static String pathToConditionals() {
+		return OUTPUT_PATH + "conditionals";
+	}
 
-  public static Long getSmoothingParameter() {
-    return 1L;
-  }
+	public static String pathToSecretTestSet() {
+		return INPUT_PATH + "secrettest.dat";
+	}
+	
+	public static String pathToSecretTestOutput() {
+		return OUTPUT_PATH + "secret-test-result";
+	}
+
+	public static int getSmoothingParameter() {
+		return 1;
+	}
 
 }
